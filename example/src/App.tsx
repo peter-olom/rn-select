@@ -1,31 +1,53 @@
-import * as React from 'react';
+import { StatusBar } from 'expo-status-bar';
+import React, { useState } from 'react';
 
-import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'rn-select';
+import { StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { Select, type Option, SelectProvider } from 'rn-select';
 
 export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
-
-  React.useEffect(() => {
-    multiply(3, 7).then(setResult);
-  }, []);
-
   return (
-    <View style={styles.container}>
-      <Text>Result: {result}</Text>
-    </View>
+    <>
+      <StatusBar />
+      <GestureHandlerRootView style={styles.main}>
+        <SafeAreaProvider>
+          <SelectProvider>
+            <SafeAreaView style={[styles.container]}>
+              <Content multi />
+              <Content />
+            </SafeAreaView>
+          </SelectProvider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </>
+  );
+}
+
+function Content({ multi }: { multi?: boolean }) {
+  const [options, setOptions] = useState<Option[]>([]);
+  return (
+    <Select
+      options={Array(50)
+        .fill(0)
+        .map((_, index) => [`value-${index}`, `Available Option ${index + 1}`])}
+      value={options}
+      onChangeValue={setOptions}
+      placeholder="Select Option"
+      searchPlaceholder="Search Options"
+      listTitle="Options"
+      multi={multi}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  main: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
+  container: {
+    padding: 16,
+    flex: 1,
+    gap: 16,
   },
 });
