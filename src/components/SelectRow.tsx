@@ -9,6 +9,7 @@ import {
 import useAnimations from '../hooks/useAnimation';
 import useStyles from '../hooks/useStyles';
 import Checkbox from './Checkbox';
+import type { PressableProps } from 'react-native';
 
 export interface OptionColors {
   inactiveColor?: string;
@@ -16,9 +17,9 @@ export interface OptionColors {
   checkColor?: string;
 }
 
-export interface Props {
+export interface Props extends PressableProps {
   value: string;
-  handlePress: () => void;
+  onPress: () => void;
   multi: boolean;
   checked: boolean;
   selectionEffectColor?: string;
@@ -29,7 +30,7 @@ export interface Props {
 }
 export default function SelectRow({
   value,
-  handlePress,
+  onPress,
   multi,
   checked,
   selectionEffectColor = '#d3d3d3',
@@ -37,6 +38,7 @@ export default function SelectRow({
   optionContainerStyle,
   optionTextStyle,
   optionCheckColors,
+  ...rest
 }: Props) {
   const [animatedValue, fade] = useAnimations('fade');
   const styles = useStyles(
@@ -75,8 +77,9 @@ export default function SelectRow({
     <>
       <Animated.View style={[styles.clickOverlay]} />
       <Pressable
+        {...rest}
         style={[styles.itemContainer, optionContainerStyle]}
-        onPress={handlePress}
+        onPress={onPress}
         onPressIn={() => fade(500)}
         onPressOut={() => fade(500, 'out')}
         onHoverIn={() => fade(500)}
@@ -86,7 +89,7 @@ export default function SelectRow({
         <Checkbox
           style={[styles.showIcon]}
           checked={checked}
-          onPress={handlePress}
+          onPress={onPress}
           {...optionCheckColors}
         />
       </Pressable>

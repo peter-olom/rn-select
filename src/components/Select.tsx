@@ -1,13 +1,10 @@
 import React, {
-  useRef,
   useCallback,
   useMemo,
   useState,
   type ComponentType,
 } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import SearchBox from './SearchBox';
-import { BottomSheetModal, BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { Text, View } from 'react-native';
 import useStyles from '../hooks/useStyles';
 import SelectRow, { type OptionColors } from './SelectRow';
@@ -17,6 +14,8 @@ import Anchor from './Anchor';
 import pickBy from 'lodash/pickBy';
 import type { IconStyle, Option } from '../types';
 import type { TextStyle, ViewStyle } from 'react-native';
+import { FlatList } from 'react-native';
+import ListContainer from './ListContainer';
 
 function extractStyleProps<T extends object>(
   obj: T,
@@ -66,6 +65,7 @@ interface Props {
   options: Option[];
   reverse?: boolean;
   selectionEffectColor?: string;
+  optionsScrollIndicator?: boolean;
   value?: Option[];
   onChangeInput?: (value: string) => void;
   onChangeValue?: (value: Option[]) => void;
@@ -85,6 +85,8 @@ interface Props {
   searchBackIconStyle?: IconStyle;
   searchClearIconStyle?: IconStyle;
   statsTextStyle?: TextStyle;
+  optionListContainerStyle?: ViewStyle;
+  optionListStyle?: ViewStyle;
   optionContainerStyle?: ViewStyle;
   optionTextStyle?: TextStyle;
   optionCheckColors?: OptionColors;
@@ -102,6 +104,7 @@ export default function Select({
   multi = false,
   reverse,
   selectionEffectColor,
+  optionsScrollIndicator = true,
   renderAnchor,
   renderSearch,
   renderOption,
@@ -110,27 +113,21 @@ export default function Select({
   optionCheckColors,
   ...rest
 }: Props) {
+  const [showlist, setShowlist] = useState(false);
   const styles = useStyles(
-    () => ({
-      noHandle: { display: 'none' },
-      container: {
-        flex: 1,
-        paddingTop: 16,
-        paddingHorizontal: 16,
-        gap: 12,
-      },
-      contentContainer: {},
+    ({ tokens: { size } }) => ({
       row: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         columnGap: 8,
       },
+      optionsFlatlist: { paddingHorizontal: size.sm },
+      statsRow: { paddingHorizontal: size.sm },
     }),
     []
   );
   const [search, setSearch] = useState('');
-  const bottomSheetRef = useRef<BottomSheetModal>(null);
   const selected = useMemo(() => new Map(value), [value]);
   const list = useMemo(
     () =>
@@ -139,13 +136,18 @@ export default function Select({
       ),
     [options, search]
   );
-  const dismiss = () => bottomSheetRef.current?.close();
 
-  const handleSearch = (text: string) => {
-    setSearch(text);
-    onChangeInput?.(text);
-  };
-
+  const handleSearch = useCallback(
+    (text: string) => {
+      setSearch(text);
+      onChangeInput?.(text);
+    },
+    [onChangeInput]
+  );
+  const handleDismiss = useCallback(() => {
+    handleSearch('');
+    setShowlist(false);
+  }, [handleSearch]);
   const handleRowPress = useCallback(
     (key: string, val: string) => {
       if (multi) {
@@ -158,22 +160,17 @@ export default function Select({
       } else {
         if (selected.has(key)) onChangeValue?.([]);
         else onChangeValue?.([[key, val]]);
-        dismiss();
+        handleDismiss();
       }
     },
-    [multi, onChangeValue, selected]
+    [handleDismiss, multi, onChangeValue, selected]
   );
-
-  const handleDismiss = () => {
-    handleSearch('');
-  };
-
   const handleRemove = (key: string) => {
     selected.delete(key);
     onChangeValue?.([...selected]);
   };
   const handleClear = () => onChangeValue?.([]);
-  const handleLaunch = () => bottomSheetRef.current?.present();
+  const handleLaunch = () => setShowlist(!showlist);
 
   const anchorStyleProps = extractStyleProps(rest, 'select', 'Style');
   const searchStyleProps = extractStyleProps(rest, 'search', 'Style');
@@ -185,12 +182,14 @@ export default function Select({
         {!renderOption && (
           <SelectRow
             value={val}
-            handlePress={() => handleRowPress(key, val)}
+            onPress={() => handleRowPress(key, val)}
             multi={multi}
             checked={selected.has(key)}
             reverse={reverse}
             selectionEffectColor={selectionEffectColor}
             optionCheckColors={optionCheckColors}
+            role="option"
+            aria-selected={selected.has(key)}
             {...optionStyleProps}
           />
         )}
@@ -215,7 +214,7 @@ export default function Select({
   );
 
   return (
-    <>
+    <View role="list">
       {!renderAnchor && (
         <Anchor
           placeholder={placeholder}
@@ -232,48 +231,47 @@ export default function Select({
         remove: handleRemove,
         clear: handleClear,
       })}
-
-      <BottomSheetModal
-        ref={bottomSheetRef}
-        snapPoints={['100%']}
-        handleStyle={styles.noHandle}
-        onDismiss={handleDismiss}
+      <ListContainer
+        animationType="slide"
+        visible={showlist}
+        onRequestClose={handleDismiss}
+        hardwareAccelerated
+        style={[optionStyleProps.optionListContainerStyle]}
       >
-        <SafeAreaView style={[styles.container]}>
-          {!renderSearch && (
-            <SearchBox
-              autoFocus
-              onBackPress={dismiss}
-              placeholder={searchPlaceholder}
-              value={search}
-              onChangeText={handleSearch}
-              {...searchStyleProps}
-            />
-          )}
-          {renderSearch?.({
-            search,
-            dismiss,
-            onChangeSearch: handleSearch,
-          })}
-          <View style={[styles.row]}>
-            {listTitle && <Text style={statsTextStyle}>{listTitle}</Text>}
-            <View style={[styles.row]} />
-            {showSelectionCount && multi && (
-              <Text style={statsTextStyle}>Selections: {selected.size}</Text>
-            )}
-          </View>
-          <BottomSheetFlatList
-            data={list}
-            keyExtractor={([key]: Option) => key}
-            renderItem={renderItem}
-            contentContainerStyle={[styles.contentContainer]}
-            showsVerticalScrollIndicator={false}
-            ItemSeparatorComponent={optionDivider ?? Divider}
-            keyboardShouldPersistTaps="handled"
-            ListFooterComponent={BottomSpacer}
+        {!renderSearch && (
+          <SearchBox
+            autoFocus
+            onBackPress={handleDismiss}
+            placeholder={searchPlaceholder}
+            value={search}
+            onChangeText={handleSearch}
+            role="searchbox"
+            {...searchStyleProps}
           />
-        </SafeAreaView>
-      </BottomSheetModal>
-    </>
+        )}
+        {renderSearch?.({
+          search,
+          dismiss: handleDismiss,
+          onChangeSearch: handleSearch,
+        })}
+        <View style={[styles.statsRow, styles.row]}>
+          {listTitle && <Text style={statsTextStyle}>{listTitle}</Text>}
+          <View style={[styles.row]} />
+          {showSelectionCount && multi && (
+            <Text style={statsTextStyle}>Selections: {selected.size}</Text>
+          )}
+        </View>
+        <FlatList
+          data={list}
+          keyExtractor={([key]: Option) => key}
+          renderItem={renderItem}
+          showsVerticalScrollIndicator={optionsScrollIndicator}
+          ItemSeparatorComponent={optionDivider ?? Divider}
+          keyboardShouldPersistTaps="handled"
+          ListFooterComponent={BottomSpacer}
+          style={[styles.optionsFlatlist, optionStyleProps.optionListStyle]}
+        />
+      </ListContainer>
+    </View>
   );
 }

@@ -27,28 +27,29 @@ export default function SearchBox({
   const ref = useRef<TextInput>(null);
   const [value, setValue] = useState('');
   const styles = useStyles(
-    ({ tokens }) => ({
+    ({ tokens: { size } }) => ({
       container: {
-        borderRadius: tokens.size.xs,
+        borderRadius: size.xs,
         flexDirection: 'row',
         alignItems: 'center',
+        paddingHorizontal: size.sm,
       },
       input: {
         flex: 1,
         backgroundColor: '#f9f9f9',
-        borderRadius: tokens.size.xs,
-        height: tokens.size.xl + 4,
-        paddingRight: tokens.size.lg,
-        paddingLeft: tokens.size.sm,
+        borderRadius: size.xs,
+        height: size.xl + 4,
+        paddingRight: size.lg,
+        paddingLeft: size.sm,
       },
       close: {
-        marginLeft: -tokens.size.lg,
-        width: searchClearIconStyle?.fontSize ?? tokens.size.md,
-        height: searchClearIconStyle?.fontSize ?? tokens.size.md,
+        marginLeft: -size.lg,
+        width: searchClearIconStyle?.fontSize ?? size.md,
+        height: searchClearIconStyle?.fontSize ?? size.md,
       },
       back: {
-        width: searchBackIconStyle?.fontSize ?? tokens.size.lg,
-        height: searchBackIconStyle?.fontSize ?? tokens.size.lg,
+        width: searchBackIconStyle?.fontSize ?? size.lg,
+        height: searchBackIconStyle?.fontSize ?? size.lg,
       },
     }),
     []

@@ -63,7 +63,7 @@ export default function Checkbox({
   });
 
   return (
-    <Pressable {...rest}>
+    <Pressable {...rest} role="checkbox">
       <View style={styles.container}>
         <CheckIcon stroke={stroke} style={styles.icon} />
       </View>

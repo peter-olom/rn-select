@@ -52,7 +52,7 @@ export default function Anchor({
       icon: {
         width: selectIconStyle?.fontSize ?? tokens.size.sm,
         height: selectIconStyle?.fontSize ?? tokens.size.sm,
-        paddingHorizontal: tokens.size.sm - 2,
+        paddingHorizontal: tokens.size.sm - 4,
       },
       iconContainer: { flexDirection: 'row', alignItems: 'center' },
       placeholder: { color: '#808080' },

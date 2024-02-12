@@ -1,4 +1,5 @@
-import React, { View } from 'react-native';
+import React from 'react';
+import { View } from 'react-native';
 import useStyles from '../hooks/useStyles';
 
 export default function Divider() {
