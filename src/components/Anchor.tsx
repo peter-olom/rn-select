@@ -56,7 +56,6 @@ export default function Anchor({
       },
       iconContainer: { flexDirection: 'row', alignItems: 'center' },
       placeholder: { color: '#808080' },
-      text: { fontSize: tokens.size.xs + 4 },
       closeIconContainer: {
         height: tokens.size.xl + 4,
         justifyContent: 'center',
@@ -73,7 +72,7 @@ export default function Anchor({
         </Text>
       )}
       {selected.length === 1 && !multi && (
-        <Text style={[styles.text, selectTextStyle]}>{selected[0]?.[1]}</Text>
+        <Text style={[selectTextStyle]}>{selected[0]?.[1]}</Text>
       )}
       {selected.length > 0 && multi && (
         <Selections

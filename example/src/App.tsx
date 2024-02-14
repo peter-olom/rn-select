@@ -17,8 +17,9 @@ export default function App() {
             style={[styles.container, { width: width > 480 ? 480 : width }]}
           >
             <Text style={styles.header}>RN Select</Text>
-            <SelectPreview label="Multi Select" multi zIndex={1} />
-            <SelectPreview label="Single Select" />
+            <SelectPreview label="Multi Select" multi zIndex={2} />
+            <SelectPreview label="Single Select" zIndex={1} />
+            <SelectPreview label="No Options" optionsCount={0} />
           </View>
         </SafeAreaView>
       </SafeAreaProvider>
@@ -30,14 +31,20 @@ interface SelectPreviewProps {
   label: string;
   multi?: boolean;
   zIndex?: number;
+  optionsCount?: number;
 }
-function SelectPreview({ label, multi, zIndex }: SelectPreviewProps) {
+function SelectPreview({
+  label,
+  multi,
+  zIndex,
+  optionsCount = 50,
+}: SelectPreviewProps) {
   const [options, setOptions] = useState<Option[]>([]);
   return (
     <View style={[styles.preview, { zIndex }]}>
       <Text>{label}</Text>
       <Select
-        options={Array(50)
+        options={Array(optionsCount)
           .fill(0)
           .map((_, index) => [
             `value-${index}`,

@@ -20,7 +20,8 @@ export default function ListContainer({ children, style, ...rest }: Props) {
         gap: tokens.size.sm,
       },
       optionsContainerWeb: {
-        minHeight: 400,
+        flex: 1,
+        height: 400,
         paddingVertical: tokens.size.sm,
         marginTop: tokens.size.xl + tokens.size.sm,
         gap: tokens.size.sm,

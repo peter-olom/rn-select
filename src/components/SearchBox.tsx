@@ -80,7 +80,7 @@ export default function SearchBox({
           onChangeText?.(v);
         }}
       />
-      {value && (
+      {!!value && (
         <Pressable onPress={clearText}>
           <Close
             stroke={searchClearIconStyle?.color ?? '#c5c5c5'}

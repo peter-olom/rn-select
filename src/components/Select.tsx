@@ -16,6 +16,7 @@ import type { IconStyle, Option } from '../types';
 import type { TextStyle, ViewStyle } from 'react-native';
 import { FlatList } from 'react-native';
 import ListContainer from './ListContainer';
+import EmptyList from './EmptyList';
 
 function extractStyleProps<T extends object>(
   obj: T,
@@ -66,6 +67,7 @@ interface Props {
   reverse?: boolean;
   selectionEffectColor?: string;
   optionsScrollIndicator?: boolean;
+  emptySearchMsg?: string;
   value?: Option[];
   onChangeInput?: (value: string) => void;
   onChangeValue?: (value: Option[]) => void;
@@ -90,6 +92,7 @@ interface Props {
   optionContainerStyle?: ViewStyle;
   optionTextStyle?: TextStyle;
   optionCheckColors?: OptionColors;
+  emptyTextStyle?: TextStyle;
 }
 
 export default function Select({
@@ -105,12 +108,14 @@ export default function Select({
   reverse,
   selectionEffectColor,
   optionsScrollIndicator = true,
+  emptySearchMsg,
   renderAnchor,
   renderSearch,
   renderOption,
   optionDivider,
   statsTextStyle,
   optionCheckColors,
+  emptyTextStyle,
   ...rest
 }: Props) {
   const [showlist, setShowlist] = useState(false);
@@ -122,7 +127,11 @@ export default function Select({
         alignItems: 'center',
         columnGap: 8,
       },
-      optionsFlatlist: { paddingHorizontal: size.sm },
+      optionsFlatlist: {
+        flex: 1,
+        paddingHorizontal: size.sm,
+      },
+      optionsFlatlistContent: { flexGrow: 1 },
       statsRow: { paddingHorizontal: size.sm },
     }),
     []
@@ -175,6 +184,7 @@ export default function Select({
   const anchorStyleProps = extractStyleProps(rest, 'select', 'Style');
   const searchStyleProps = extractStyleProps(rest, 'search', 'Style');
   const optionStyleProps = extractStyleProps(rest, 'option', 'Style');
+  const noOptions = options.length === 0 ? 'No Options' : undefined;
 
   const renderItem = useCallback(
     ({ item: [key, val] }: { item: Option }) => (
@@ -269,7 +279,14 @@ export default function Select({
           ItemSeparatorComponent={optionDivider ?? Divider}
           keyboardShouldPersistTaps="handled"
           ListFooterComponent={BottomSpacer}
+          ListEmptyComponent={
+            <EmptyList
+              textStyle={emptyTextStyle}
+              msg={noOptions ?? emptySearchMsg}
+            />
+          }
           style={[styles.optionsFlatlist, optionStyleProps.optionListStyle]}
+          contentContainerStyle={styles.optionsFlatlistContent}
         />
       </ListContainer>
     </View>

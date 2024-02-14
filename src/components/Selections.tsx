@@ -77,7 +77,6 @@ function SelectionChip({
         overflow: 'hidden',
       },
       text: {
-        fontSize: 12,
         paddingHorizontal: tokens.size.xs,
         paddingVertical: tokens.size.xs / 2,
         backgroundColor: '#f1f1f1',

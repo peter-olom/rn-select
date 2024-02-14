@@ -8,7 +8,6 @@ export default function BottomSpacer() {
     () => ({
       container: {
         height: height,
-        transform: [{ scaleY: 0 }],
       },
     }),
     [height]
