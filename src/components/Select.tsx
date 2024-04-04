@@ -57,20 +57,18 @@ interface RenderOptioon {
   (props: RenderOptionProps): JSX.Element;
 }
 
-interface Props {
+export interface CommonProps {
   placeholder?: string;
   listTitle?: string;
   searchPlaceholder?: string;
-  multi?: boolean;
   showSelectionCount?: boolean;
   options: Option[];
   reverse?: boolean;
   selectionEffectColor?: string;
   optionsScrollIndicator?: boolean;
   emptySearchMsg?: string;
-  value?: Option[];
+  value?: string | string[];
   onChangeInput?: (value: string) => void;
-  onChangeValue?: (value: Option[]) => void;
   renderAnchor?: RenderAnchor;
   renderSearch?: RenderSearch;
   renderOption?: RenderOptioon;
@@ -95,16 +93,27 @@ interface Props {
   emptyTextStyle?: TextStyle;
 }
 
+export interface SingleSelectProps extends CommonProps {
+  value?: string;
+  onChangeValue?: (value: string) => void;
+}
+
+export interface MultiSelectProps extends CommonProps {
+  multi: true;
+  value?: string[];
+  onChangeValue?: (value: string[]) => void;
+}
+
+export type Props = SingleSelectProps | MultiSelectProps;
+
 export default function Select({
   options,
   value,
-  onChangeValue,
   onChangeInput,
   placeholder,
   searchPlaceholder,
   listTitle,
   showSelectionCount = true,
-  multi = false,
   reverse,
   selectionEffectColor,
   optionsScrollIndicator = true,
@@ -137,7 +146,26 @@ export default function Select({
     []
   );
   const [search, setSearch] = useState('');
-  const selected = useMemo(() => new Map(value), [value]);
+
+  const [selectedMap, selectedOptions] = useMemo(() => {
+    const optionsMap = new Map(options);
+    const foundOptions = [] as Option[];
+    if (value) {
+      if (Array.isArray(value)) {
+        const foundValues = value
+          .map((item) => {
+            return [item, optionsMap.get(item)] as Option;
+          })
+          .filter((item) => item[1]);
+        foundOptions.push(...foundValues);
+      } else {
+        const item = optionsMap.get(value);
+        if (item) foundOptions.push([value, item]);
+      }
+    }
+    return [new Map(foundOptions), foundOptions] as const;
+  }, [options, value]);
+
   const list = useMemo(
     () =>
       options.filter(([_, val]) =>
@@ -153,32 +181,37 @@ export default function Select({
     },
     [onChangeInput]
   );
+
   const handleDismiss = useCallback(() => {
     handleSearch('');
     setShowlist(false);
   }, [handleSearch]);
+
   const handleRowPress = useCallback(
-    (key: string, val: string) => {
-      if (multi) {
-        if (selected.has(key)) {
-          selected.delete(key);
-          onChangeValue?.([...selected]);
+    (key: string) => {
+      if ('multi' in rest) {
+        if (selectedMap.has(key)) {
+          selectedMap.delete(key);
+          rest.onChangeValue?.([...selectedMap.keys()]);
         } else {
-          onChangeValue?.([...selected, [key, val]]);
+          rest.onChangeValue?.([...selectedMap.keys(), key]);
         }
       } else {
-        if (selected.has(key)) onChangeValue?.([]);
-        else onChangeValue?.([[key, val]]);
+        if (selectedMap.has(key)) rest.onChangeValue?.('');
+        else rest.onChangeValue?.(key);
         handleDismiss();
       }
     },
-    [handleDismiss, multi, onChangeValue, selected]
+    [handleDismiss, rest, selectedMap]
   );
   const handleRemove = (key: string) => {
-    selected.delete(key);
-    onChangeValue?.([...selected]);
+    selectedMap.delete(key);
+    if ('multi' in rest) rest.onChangeValue?.([...selectedMap.keys()]);
   };
-  const handleClear = () => onChangeValue?.([]);
+  const handleClear = () => {
+    if ('multi' in rest) rest.onChangeValue?.([]);
+    else rest.onChangeValue?.('');
+  };
   const handleLaunch = () => setShowlist(!showlist);
 
   const anchorStyleProps = extractStyleProps(rest, 'select', 'Style');
@@ -186,28 +219,30 @@ export default function Select({
   const optionStyleProps = extractStyleProps(rest, 'option', 'Style');
   const noOptions = options.length === 0 ? 'No Options' : undefined;
 
+  const multi = useMemo(() => ('multi' in rest ? true : false), [rest]);
+
   const renderItem = useCallback(
     ({ item: [key, val] }: { item: Option }) => (
       <>
         {!renderOption && (
           <SelectRow
             value={val}
-            onPress={() => handleRowPress(key, val)}
+            onPress={() => handleRowPress(key)}
             multi={multi}
-            checked={selected.has(key)}
+            checked={selectedMap.has(key)}
             reverse={reverse}
             selectionEffectColor={selectionEffectColor}
             optionCheckColors={optionCheckColors}
             role="option"
-            aria-selected={selected.has(key)}
+            aria-selected={selectedMap.has(key)}
             {...optionStyleProps}
           />
         )}
         {renderOption?.({
           optionKey: key,
           optionValue: val,
-          isChecked: selected.has(key),
-          onPress: () => handleRowPress(key, val),
+          isChecked: selectedMap.has(key),
+          onPress: () => handleRowPress(key),
         })}
       </>
     ),
@@ -218,17 +253,19 @@ export default function Select({
       optionStyleProps,
       renderOption,
       reverse,
-      selected,
+      selectedMap,
       selectionEffectColor,
     ]
   );
+
+  console.log('@@@', { selectedMap, selectedOptions });
 
   return (
     <View role="list">
       {!renderAnchor && (
         <Anchor
           placeholder={placeholder}
-          selected={value ?? []}
+          selected={selectedOptions ?? []}
           multi={multi}
           onPress={handleLaunch}
           onRemove={handleRemove}
@@ -268,7 +305,7 @@ export default function Select({
           {listTitle && <Text style={statsTextStyle}>{listTitle}</Text>}
           <View style={[styles.row]} />
           {showSelectionCount && multi && (
-            <Text style={statsTextStyle}>Selections: {selected.size}</Text>
+            <Text style={statsTextStyle}>Selections: {selectedMap.size}</Text>
           )}
         </View>
         <FlatList

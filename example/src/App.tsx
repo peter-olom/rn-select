@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { Select, type Option } from 'rn-select';
+import { Select } from 'rn-select';
 
 export default function App() {
   const { width } = useWindowDimensions();
@@ -17,9 +17,9 @@ export default function App() {
             style={[styles.container, { width: width > 480 ? 480 : width }]}
           >
             <Text style={styles.header}>RN Select</Text>
-            <SelectPreview label="Multi Select" multi zIndex={2} />
-            <SelectPreview label="Single Select" zIndex={1} />
-            <SelectPreview label="No Options" optionsCount={0} />
+            <MultiSelect label="Multi Select" zIndex={2} />
+            <SingleSelect label="Single Select" zIndex={1} />
+            <SingleSelect label="No Options" optionsCount={0} />
           </View>
         </SafeAreaView>
       </SafeAreaProvider>
@@ -27,19 +27,13 @@ export default function App() {
   );
 }
 
-interface SelectPreviewProps {
+interface SingleSelectProps {
   label: string;
-  multi?: boolean;
   zIndex?: number;
   optionsCount?: number;
 }
-function SelectPreview({
-  label,
-  multi,
-  zIndex,
-  optionsCount = 50,
-}: SelectPreviewProps) {
-  const [options, setOptions] = useState<Option[]>([]);
+function SingleSelect({ label, zIndex, optionsCount = 50 }: SingleSelectProps) {
+  const [options, setOptions] = useState<string>('');
   return (
     <View style={[styles.preview, { zIndex }]}>
       <Text>{label}</Text>
@@ -55,8 +49,37 @@ function SelectPreview({
         placeholder="Select Option"
         searchPlaceholder="Search Options"
         listTitle="Options"
-        multi={multi}
         reverse
+      />
+    </View>
+  );
+}
+
+interface MultiSelectProps {
+  label: string;
+  zIndex?: number;
+  optionsCount?: number;
+}
+function MultiSelect({ label, zIndex, optionsCount = 50 }: MultiSelectProps) {
+  const [options, setOptions] = useState<string[]>([]);
+
+  return (
+    <View style={[styles.preview, { zIndex }]}>
+      <Text>{label}</Text>
+      <Select
+        options={Array(optionsCount)
+          .fill(0)
+          .map((_, index) => [
+            `value-${index}`,
+            `Available Option ${index + 1}`,
+          ])}
+        value={options}
+        onChangeValue={setOptions}
+        placeholder="Select Option"
+        searchPlaceholder="Search Options"
+        listTitle="Options"
+        reverse
+        multi
       />
     </View>
   );
