@@ -12,11 +12,12 @@ import BottomSpacer from './BottomSpacer';
 import Divider from './Divider';
 import Anchor from './Anchor';
 import pickBy from 'lodash/pickBy';
-import type { IconStyle, Option } from '../types';
+import type { AnchorPos, IconStyle, LayoutRect, Option } from '../types';
 import type { TextStyle, ViewStyle } from 'react-native';
 import { FlatList } from 'react-native';
 import ListContainer from './ListContainer';
 import EmptyList from './EmptyList';
+import { Platform } from 'react-native';
 
 function extractStyleProps<T extends object>(
   obj: T,
@@ -33,6 +34,7 @@ interface RenderAnchorProps {
   launch: () => void;
   remove: (key: string) => void;
   clear: () => void;
+  setRect: (pos: LayoutRect) => void;
 }
 interface RenderAnchor {
   (props: RenderAnchorProps): JSX.Element;
@@ -53,7 +55,7 @@ interface RenderOptionProps {
   isChecked: boolean;
   onPress: () => void;
 }
-interface RenderOptioon {
+interface RenderOption {
   (props: RenderOptionProps): JSX.Element;
 }
 
@@ -71,7 +73,7 @@ export interface CommonProps {
   onChangeInput?: (value: string) => void;
   renderAnchor?: RenderAnchor;
   renderSearch?: RenderSearch;
-  renderOption?: RenderOptioon;
+  renderOption?: RenderOption;
   optionDivider?: ComponentType;
   selectStyle?: ViewStyle;
   selectPlaceholderTextStyle?: TextStyle;
@@ -128,6 +130,10 @@ export default function Select({
   ...rest
 }: Props) {
   const [showlist, setShowlist] = useState(false);
+  const [search, setSearch] = useState('');
+  const [anchorPosition, setAnchorPosition] = useState<AnchorPos>({});
+
+  const MIN_WIDTH = 280;
   const styles = useStyles(
     ({ tokens: { size } }) => ({
       row: {
@@ -142,10 +148,18 @@ export default function Select({
       },
       optionsFlatlistContent: { flexGrow: 1 },
       statsRow: { paddingHorizontal: size.sm },
+      optionListContainer: Platform.select({
+        web: {
+          minWidth: MIN_WIDTH,
+          ...((anchorPosition.width ?? 0) >= MIN_WIDTH && {
+            width: anchorPosition.width,
+          }),
+        },
+        default: {},
+      }),
     }),
-    []
+    [anchorPosition]
   );
-  const [search, setSearch] = useState('');
 
   const [selectedMap, selectedOptions] = useMemo(() => {
     const optionsMap = new Map(options);
@@ -204,15 +218,23 @@ export default function Select({
     },
     [handleDismiss, rest, selectedMap]
   );
-  const handleRemove = (key: string) => {
-    selectedMap.delete(key);
-    if ('multi' in rest) rest.onChangeValue?.([...selectedMap.keys()]);
-  };
-  const handleClear = () => {
+  const handleRemove = useCallback(
+    (key: string) => {
+      selectedMap.delete(key);
+      if ('multi' in rest) rest.onChangeValue?.([...selectedMap.keys()]);
+    },
+    [rest, selectedMap]
+  );
+  const handleClear = useCallback(() => {
     if ('multi' in rest) rest.onChangeValue?.([]);
     else rest.onChangeValue?.('');
-  };
-  const handleLaunch = () => setShowlist(!showlist);
+  }, [rest]);
+  const handleLaunch = useCallback(() => setShowlist(!showlist), [showlist]);
+
+  const handleLayout = useCallback((rect: LayoutRect) => {
+    const { top, left, width } = rect;
+    setAnchorPosition({ x: left ?? 0, y: top ?? 0, width });
+  }, []);
 
   const anchorStyleProps = extractStyleProps(rest, 'select', 'Style');
   const searchStyleProps = extractStyleProps(rest, 'search', 'Style');
@@ -258,7 +280,16 @@ export default function Select({
     ]
   );
 
-  console.log('@@@', { selectedMap, selectedOptions });
+  const customAnchor = useMemo(
+    () =>
+      renderAnchor?.({
+        launch: handleLaunch,
+        remove: handleRemove,
+        clear: handleClear,
+        setRect: handleLayout,
+      }),
+    [handleClear, handleLaunch, handleLayout, handleRemove, renderAnchor]
+  );
 
   return (
     <View role="list">
@@ -270,44 +301,58 @@ export default function Select({
           onPress={handleLaunch}
           onRemove={handleRemove}
           onClear={handleClear}
+          onLayout={handleLayout}
           {...anchorStyleProps}
         />
       )}
-      {renderAnchor?.({
-        launch: handleLaunch,
-        remove: handleRemove,
-        clear: handleClear,
-      })}
+      {customAnchor}
+
       <ListContainer
-        animationType="slide"
         visible={showlist}
         onRequestClose={handleDismiss}
         hardwareAccelerated
-        style={[optionStyleProps.optionListContainerStyle]}
-      >
-        {!renderSearch && (
-          <SearchBox
-            autoFocus
-            onBackPress={handleDismiss}
-            placeholder={searchPlaceholder}
-            value={search}
-            onChangeText={handleSearch}
-            role="searchbox"
-            {...searchStyleProps}
-          />
-        )}
-        {renderSearch?.({
-          search,
-          dismiss: handleDismiss,
-          onChangeSearch: handleSearch,
+        style={[
+          styles.optionListContainer,
+          optionStyleProps.optionListContainerStyle,
+        ]}
+        {...Platform.select({
+          web: {
+            animationType: 'fade',
+            transparent: true,
+            position: anchorPosition,
+          },
+          default: { animationType: 'slide' },
         })}
-        <View style={[styles.statsRow, styles.row]}>
-          {listTitle && <Text style={statsTextStyle}>{listTitle}</Text>}
-          <View style={[styles.row]} />
-          {showSelectionCount && multi && (
-            <Text style={statsTextStyle}>Selections: {selectedMap.size}</Text>
-          )}
-        </View>
+      >
+        {!noOptions && (
+          <>
+            {!renderSearch && (
+              <SearchBox
+                autoFocus
+                onBackPress={handleDismiss}
+                placeholder={searchPlaceholder}
+                value={search}
+                onChangeText={handleSearch}
+                role="searchbox"
+                {...searchStyleProps}
+              />
+            )}
+            {renderSearch?.({
+              search,
+              dismiss: handleDismiss,
+              onChangeSearch: handleSearch,
+            })}
+            <View style={[styles.statsRow, styles.row]}>
+              {listTitle && <Text style={statsTextStyle}>{listTitle}</Text>}
+              <View style={[styles.row]} />
+              {showSelectionCount && multi && (
+                <Text style={statsTextStyle}>
+                  Selections: {selectedMap.size}
+                </Text>
+              )}
+            </View>
+          </>
+        )}
         <FlatList
           data={list}
           keyExtractor={([key]: Option) => key}

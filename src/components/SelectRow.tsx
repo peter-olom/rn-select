@@ -33,7 +33,7 @@ export default function SelectRow({
   onPress,
   multi,
   checked,
-  selectionEffectColor = '#d3d3d3',
+  selectionEffectColor = '#efefef',
   reverse,
   optionContainerStyle,
   optionTextStyle,

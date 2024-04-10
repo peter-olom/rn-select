@@ -13,13 +13,13 @@ export default function EmptyList({ msg, textStyle }: Props) {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: 300,
       },
       text: {
-        fontSize: size.lg,
+        fontSize: size.md,
         fontStyle: 'italic',
         color: '#808080',
         textAlign: 'center',
+        paddingVertical: size.lg,
       },
     }),
     []
