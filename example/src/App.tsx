@@ -17,8 +17,8 @@ export default function App() {
             style={[styles.container, { width: width > 480 ? 480 : width }]}
           >
             <Text style={styles.header}>RN Select</Text>
-            <MultiSelect label="Multi Select" zIndex={2} />
-            <SingleSelect label="Single Select" zIndex={1} />
+            <MultiSelect label="Multi Select" />
+            <SingleSelect label="Single Select" optionsCount={3} />
             <SingleSelect label="No Options" optionsCount={0} />
           </View>
         </SafeAreaView>
@@ -32,10 +32,10 @@ interface SingleSelectProps {
   zIndex?: number;
   optionsCount?: number;
 }
-function SingleSelect({ label, zIndex, optionsCount = 50 }: SingleSelectProps) {
+function SingleSelect({ label, optionsCount = 50 }: SingleSelectProps) {
   const [options, setOptions] = useState<string>('');
   return (
-    <View style={[styles.preview, { zIndex }]}>
+    <View style={[styles.preview]}>
       <Text>{label}</Text>
       <Select
         options={Array(optionsCount)
@@ -47,7 +47,7 @@ function SingleSelect({ label, zIndex, optionsCount = 50 }: SingleSelectProps) {
         value={options}
         onChangeValue={setOptions}
         placeholder="Select Option"
-        searchPlaceholder="Search Options"
+        searchPlaceholder="Search Available Options"
         listTitle="Options"
         reverse
       />
@@ -57,14 +57,13 @@ function SingleSelect({ label, zIndex, optionsCount = 50 }: SingleSelectProps) {
 
 interface MultiSelectProps {
   label: string;
-  zIndex?: number;
   optionsCount?: number;
 }
-function MultiSelect({ label, zIndex, optionsCount = 50 }: MultiSelectProps) {
+function MultiSelect({ label, optionsCount = 50 }: MultiSelectProps) {
   const [options, setOptions] = useState<string[]>([]);
 
   return (
-    <View style={[styles.preview, { zIndex }]}>
+    <View style={styles.preview}>
       <Text>{label}</Text>
       <Select
         options={Array(optionsCount)
@@ -76,7 +75,7 @@ function MultiSelect({ label, zIndex, optionsCount = 50 }: MultiSelectProps) {
         value={options}
         onChangeValue={setOptions}
         placeholder="Select Option"
-        searchPlaceholder="Search Options"
+        searchPlaceholder="Search Available Options"
         listTitle="Options"
         reverse
         multi
