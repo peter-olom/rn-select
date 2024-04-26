@@ -18,6 +18,7 @@ interface Props extends Omit<TextInputProps, 'style'> {
 export default function SearchBox({
   onBackPress,
   onChangeText,
+  placeholder,
   searchContainerStyle,
   searchInputStyle,
   searchBackIconStyle,
@@ -34,11 +35,14 @@ export default function SearchBox({
         alignItems: 'center',
         paddingHorizontal: size.sm,
       },
+      inputWrapper: {
+        flex: 1,
+        height: size.xl,
+      },
       input: {
         flex: 1,
         backgroundColor: '#f9f9f9',
         borderRadius: size.xs,
-        height: size.xl + 4,
         paddingRight: size.lg,
         paddingLeft: size.sm,
       },
@@ -71,15 +75,18 @@ export default function SearchBox({
           />
         </Pressable>
       )}
-      <TextInput
-        {...rest}
-        ref={ref}
-        style={[styles.input, searchInputStyle]}
-        onChangeText={(v) => {
-          setValue(v);
-          onChangeText?.(v);
-        }}
-      />
+      <Pressable style={styles.inputWrapper}>
+        <TextInput
+          ref={ref}
+          {...rest}
+          placeholder={placeholder ?? 'Search...'}
+          style={[styles.input, searchInputStyle]}
+          onChangeText={(v) => {
+            setValue(v);
+            onChangeText?.(v);
+          }}
+        />
+      </Pressable>
       {!!value && (
         <Pressable onPress={clearText}>
           <Close

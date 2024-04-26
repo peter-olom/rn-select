@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import type { ModalProps } from 'react-native';
 import { Modal, SafeAreaView } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -8,6 +8,8 @@ import { Platform } from 'react-native';
 import { Pressable } from 'react-native';
 import type { AnchorPos } from '../types';
 import { useWindowDimensions } from 'react-native';
+import type { ViewProps } from 'react-native';
+import { MIN_WIDTH } from './common';
 
 interface Props extends ModalProps {
   position?: AnchorPos;
@@ -19,14 +21,22 @@ export default function ListContainer({
   position,
   ...rest
 }: Props) {
-  const { width } = useWindowDimensions();
-  const willBleed = (position?.x ?? 0) + 280 > width;
+  const { width, height } = useWindowDimensions();
+  const [listHeight, setListHeight] = useState(0);
 
+  // will bleed horizontally
+  const willBleed = (position?.x ?? 0) + MIN_WIDTH > width;
   const left = willBleed ? undefined : position?.x ?? 0;
   const right = willBleed
     ? width - ((position?.x ?? 0) + (position?.width ?? 0))
     : undefined;
-  const top = position?.y ?? 0;
+
+  const top = useMemo(() => {
+    if (height - (position?.y ?? 0) < listHeight + 80) {
+      return height - listHeight - 80;
+    }
+    return position?.y ?? 0;
+  }, [height, listHeight, position?.y]);
 
   const styles = useStyles(
     ({ tokens }) => ({
@@ -72,11 +82,32 @@ export default function ListContainer({
     <Modal {...rest}>
       <Pressable style={styles.backdrop} onPress={rest.onRequestClose}>
         <SafeAreaProvider>
-          <SafeAreaView style={[styles.optionsContainer, style]}>
+          <ListContent
+            style={[styles.optionsContainer, style]}
+            onListHeight={setListHeight}
+          >
             <View style={styles.optionsContainerInner}>{children}</View>
-          </SafeAreaView>
+          </ListContent>
         </SafeAreaProvider>
       </Pressable>
     </Modal>
   );
+}
+
+interface Props extends ViewProps {
+  onListHeight?: (height: number) => void;
+}
+function ListContent({ onListHeight, ...rest }: Props) {
+  const [containerRef, setContainerRef] = useState<View | null>(null);
+
+  useEffect(() => {
+    const onViewLayout = () => {
+      containerRef?.measure((_x, _y, _w, h, _pageX, _pageY) => {
+        onListHeight?.(h);
+      });
+    };
+    onViewLayout();
+  }, [containerRef, onListHeight]);
+
+  return <SafeAreaView ref={setContainerRef} {...rest} />;
 }

@@ -20,6 +20,13 @@ export default function App() {
             <MultiSelect label="Multi Select" />
             <SingleSelect label="Single Select" optionsCount={3} />
             <SingleSelect label="No Options" optionsCount={0} />
+            <MultiSelect label="Creatable Select" creatable />
+            <MultiSelect
+              label="Disabled Select"
+              optionsCount={10}
+              defaults={['value-3', 'value-7']}
+              disabled
+            />
           </View>
         </SafeAreaView>
       </SafeAreaProvider>
@@ -29,7 +36,6 @@ export default function App() {
 
 interface SingleSelectProps {
   label: string;
-  zIndex?: number;
   optionsCount?: number;
 }
 function SingleSelect({ label, optionsCount = 50 }: SingleSelectProps) {
@@ -48,6 +54,7 @@ function SingleSelect({ label, optionsCount = 50 }: SingleSelectProps) {
         onChangeValue={setOptions}
         placeholder="Select Option"
         searchPlaceholder="Search Available Options"
+        searchPlaceholderTextColor="gray"
         listTitle="Options"
         reverse
       />
@@ -58,9 +65,18 @@ function SingleSelect({ label, optionsCount = 50 }: SingleSelectProps) {
 interface MultiSelectProps {
   label: string;
   optionsCount?: number;
+  creatable?: boolean;
+  disabled?: boolean;
+  defaults?: string[];
 }
-function MultiSelect({ label, optionsCount = 50 }: MultiSelectProps) {
-  const [options, setOptions] = useState<string[]>([]);
+function MultiSelect({
+  label,
+  optionsCount = 50,
+  creatable,
+  disabled,
+  defaults = [],
+}: MultiSelectProps) {
+  const [options, setOptions] = useState<string[]>(defaults);
 
   return (
     <View style={styles.preview}>
@@ -77,6 +93,9 @@ function MultiSelect({ label, optionsCount = 50 }: MultiSelectProps) {
         placeholder="Select Option"
         searchPlaceholder="Search Available Options"
         listTitle="Options"
+        searchPlaceholderTextColor="gray"
+        createable={creatable}
+        disabled={disabled}
         reverse
         multi
       />
@@ -87,14 +106,14 @@ function MultiSelect({ label, optionsCount = 50 }: MultiSelectProps) {
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    gap: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   container: {
+    flex: 1,
     padding: 16,
     gap: 16,
-    marginTop: -180,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignSelf: 'center',
   },
   header: {
     fontSize: 32,

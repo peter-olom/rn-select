@@ -18,6 +18,7 @@ import { FlatList } from 'react-native';
 import ListContainer from './ListContainer';
 import EmptyList from './EmptyList';
 import { Platform } from 'react-native';
+import { MIN_WIDTH } from './common';
 
 function extractStyleProps<T extends object>(
   obj: T,
@@ -63,6 +64,7 @@ export interface CommonProps {
   placeholder?: string;
   listTitle?: string;
   searchPlaceholder?: string;
+  searchPlaceholderTextColor?: string;
   showSelectionCount?: boolean;
   options: Option[];
   reverse?: boolean;
@@ -70,6 +72,11 @@ export interface CommonProps {
   optionsScrollIndicator?: boolean;
   emptySearchMsg?: string;
   value?: string | string[];
+  clearable?: boolean;
+  disabled?: boolean;
+  searchable?: boolean;
+  createable?: boolean;
+  onCreateItem?: (value: string) => void;
   onChangeInput?: (value: string) => void;
   renderAnchor?: RenderAnchor;
   renderSearch?: RenderSearch;
@@ -112,14 +119,20 @@ export default function Select({
   options,
   value,
   onChangeInput,
+  onCreateItem,
   placeholder,
   searchPlaceholder,
+  searchPlaceholderTextColor,
   listTitle,
   showSelectionCount = true,
   reverse,
   selectionEffectColor,
   optionsScrollIndicator = true,
   emptySearchMsg,
+  clearable = true,
+  disabled,
+  searchable = true,
+  createable,
   renderAnchor,
   renderSearch,
   renderOption,
@@ -132,8 +145,8 @@ export default function Select({
   const [showlist, setShowlist] = useState(false);
   const [search, setSearch] = useState('');
   const [anchorPosition, setAnchorPosition] = useState<AnchorPos>({});
+  const [createdOptions, setCreatedOptions] = useState<Option[]>([]);
 
-  const MIN_WIDTH = 280;
   const styles = useStyles(
     ({ tokens: { size } }) => ({
       row: {
@@ -162,7 +175,7 @@ export default function Select({
   );
 
   const [selectedMap, selectedOptions] = useMemo(() => {
-    const optionsMap = new Map(options);
+    const optionsMap = new Map([...options, ...createdOptions]);
     const foundOptions = [] as Option[];
     if (value) {
       if (Array.isArray(value)) {
@@ -178,14 +191,14 @@ export default function Select({
       }
     }
     return [new Map(foundOptions), foundOptions] as const;
-  }, [options, value]);
+  }, [createdOptions, options, value]);
 
   const list = useMemo(
     () =>
-      options.filter(([_, val]) =>
+      [...options, ...createdOptions].filter(([_, val]) =>
         val.toLowerCase().includes(search.toLowerCase())
       ),
-    [options, search]
+    [createdOptions, options, search]
   );
 
   const handleSearch = useCallback(
@@ -235,6 +248,15 @@ export default function Select({
     const { top, left, width } = rect;
     setAnchorPosition({ x: left ?? 0, y: top ?? 0, width });
   }, []);
+
+  const handleCreateItem = useCallback(
+    (createValue: string) => {
+      onCreateItem?.(createValue);
+      setCreatedOptions((c) => [...c, [createValue, createValue]]);
+      handleRowPress(createValue);
+    },
+    [handleRowPress, onCreateItem]
+  );
 
   const anchorStyleProps = extractStyleProps(rest, 'select', 'Style');
   const searchStyleProps = extractStyleProps(rest, 'search', 'Style');
@@ -298,10 +320,12 @@ export default function Select({
           placeholder={placeholder}
           selected={selectedOptions ?? []}
           multi={multi}
-          onPress={handleLaunch}
+          onPress={disabled ? null : handleLaunch}
           onRemove={handleRemove}
           onClear={handleClear}
           onLayout={handleLayout}
+          disabled={disabled}
+          clearable={clearable}
           {...anchorStyleProps}
         />
       )}
@@ -324,7 +348,7 @@ export default function Select({
           default: { animationType: 'slide' },
         })}
       >
-        {!noOptions && (
+        {searchable && (
           <>
             {!renderSearch && (
               <SearchBox
@@ -334,6 +358,7 @@ export default function Select({
                 value={search}
                 onChangeText={handleSearch}
                 role="searchbox"
+                placeholderTextColor={searchPlaceholderTextColor}
                 {...searchStyleProps}
               />
             )}
@@ -342,17 +367,15 @@ export default function Select({
               dismiss: handleDismiss,
               onChangeSearch: handleSearch,
             })}
-            <View style={[styles.statsRow, styles.row]}>
-              {listTitle && <Text style={statsTextStyle}>{listTitle}</Text>}
-              <View style={[styles.row]} />
-              {showSelectionCount && multi && (
-                <Text style={statsTextStyle}>
-                  Selections: {selectedMap.size}
-                </Text>
-              )}
-            </View>
           </>
         )}
+        <View style={[styles.statsRow, styles.row]}>
+          {listTitle && <Text style={statsTextStyle}>{listTitle}</Text>}
+          <View style={[styles.row]} />
+          {showSelectionCount && multi && (
+            <Text style={statsTextStyle}>Selections: {selectedMap.size}</Text>
+          )}
+        </View>
         <FlatList
           data={list}
           keyExtractor={([key]: Option) => key}
@@ -365,6 +388,8 @@ export default function Select({
             <EmptyList
               textStyle={emptyTextStyle}
               msg={noOptions ?? emptySearchMsg}
+              createOption={createable ? search : undefined}
+              onCreate={handleCreateItem}
             />
           }
           style={[styles.optionsFlatlist, optionStyleProps.optionListStyle]}

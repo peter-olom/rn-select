@@ -12,11 +12,14 @@ import ChevronDownIcon from '../icons/ChevronDownIcon';
 import type { IconStyle, LayoutRect, Option } from '../types';
 import Selections from './Selections';
 import CloseIcon from '../icons/CloseIcon';
+import { StyleSheet } from 'react-native';
 
 interface Props extends Omit<PressableProps, 'onLayout'> {
   placeholder?: string;
   selected: Option[];
   multi: boolean;
+  clearable?: boolean;
+  disabled?: boolean;
   onRemove: (key: string) => void;
   onClear: () => void;
   onLayout: (rect: LayoutRect) => void;
@@ -33,6 +36,8 @@ export default function Anchor({
   placeholder,
   selected,
   multi = false,
+  clearable,
+  disabled,
   onRemove,
   onClear,
   onLayout,
@@ -68,8 +73,14 @@ export default function Anchor({
         height: tokens.size.xl + 4,
         justifyContent: 'center',
       },
+      disabled: {
+        cursor: 'not-allowed',
+        backgroundColor: 'white',
+        opacity: 0.4,
+        borderRadius: tokens.size.xs,
+      },
     }),
-    [selectIconStyle]
+    [selectIconStyle, disabled]
   );
   const ref = useRef<View>(null);
   const onLayoutRef = useRef(onLayout);
@@ -119,7 +130,7 @@ export default function Anchor({
         />
       )}
       <View style={styles.iconContainer}>
-        {selected.length > 0 && (
+        {selected.length > 0 && clearable && !disabled && (
           <Pressable style={styles.closeIconContainer} onPress={onClear}>
             <CloseIcon
               stroke={selectIconStyle?.color ?? '#c5c5c5'}
@@ -132,6 +143,7 @@ export default function Anchor({
           style={styles.icon}
         />
       </View>
+      {disabled && <View style={[StyleSheet.absoluteFill, styles.disabled]} />}
     </Pressable>
   );
 }
