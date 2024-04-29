@@ -1,5 +1,5 @@
 {
-  "name": "rn-select",
+  "name": "@devrue/rn-select",
   "version": "1.0.0",
   "description": "Custom typescript only select component for react native",
   "main": "lib/commonjs/index",
