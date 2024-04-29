@@ -16,11 +16,11 @@ React Native Select is a select component for React Native that is compatible wi
 ## Installation
 
 ```sh
-yarn add rn-select
+yarn add @devrue/rn-select
 ```
 or
 ```sh
-npm install rn-select
+npm install @devrue/rn-select
 ```
 
 ## Usage

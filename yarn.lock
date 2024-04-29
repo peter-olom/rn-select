@@ -1927,6 +1927,41 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@devrue/rn-select@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@devrue/rn-select@workspace:."
+  dependencies:
+    "@commitlint/config-conventional": ^17.0.2
+    "@evilmartians/lefthook": ^1.5.0
+    "@react-native/eslint-config": ^0.72.2
+    "@release-it/conventional-changelog": ^5.0.0
+    "@types/jest": ^28.1.2
+    "@types/lodash": ^4.14.202
+    "@types/react": ~17.0.21
+    "@types/react-native": 0.70.0
+    commitlint: ^17.0.2
+    del-cli: ^5.0.0
+    eslint: ^8.4.1
+    eslint-config-prettier: ^8.5.0
+    eslint-plugin-prettier: ^4.0.0
+    jest: ^28.1.1
+    lodash: ^4.17.21
+    prettier: ^2.0.5
+    react: 18.2.0
+    react-native: 0.73.2
+    react-native-builder-bob: ^0.20.0
+    react-native-safe-area-context: ^4.9.0
+    react-native-svg: ^14.1.0
+    release-it: ^15.0.0
+    typescript: ^5.0.2
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-safe-area-context: ^4.8.2
+    react-native-svg: ~14.1.0
+  languageName: unknown
+  linkType: soft
+
 "@eslint-community/eslint-utils@npm:^4.2.0":
   version: 4.4.0
   resolution: "@eslint-community/eslint-utils@npm:4.4.0"
@@ -15583,41 +15618,6 @@ __metadata:
     react-native-safe-area-context: 4.8.2
     react-native-svg: 14.1.0
     react-native-web: ~0.19.6
-  languageName: unknown
-  linkType: soft
-
-"rn-select@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "rn-select@workspace:."
-  dependencies:
-    "@commitlint/config-conventional": ^17.0.2
-    "@evilmartians/lefthook": ^1.5.0
-    "@react-native/eslint-config": ^0.72.2
-    "@release-it/conventional-changelog": ^5.0.0
-    "@types/jest": ^28.1.2
-    "@types/lodash": ^4.14.202
-    "@types/react": ~17.0.21
-    "@types/react-native": 0.70.0
-    commitlint: ^17.0.2
-    del-cli: ^5.0.0
-    eslint: ^8.4.1
-    eslint-config-prettier: ^8.5.0
-    eslint-plugin-prettier: ^4.0.0
-    jest: ^28.1.1
-    lodash: ^4.17.21
-    prettier: ^2.0.5
-    react: 18.2.0
-    react-native: 0.73.2
-    react-native-builder-bob: ^0.20.0
-    react-native-safe-area-context: ^4.9.0
-    react-native-svg: ^14.1.0
-    release-it: ^15.0.0
-    typescript: ^5.0.2
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-    react-native-safe-area-context: ^4.8.2
-    react-native-svg: ~14.1.0
   languageName: unknown
   linkType: soft
 
