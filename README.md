@@ -28,7 +28,7 @@ npm install @devrue/rn-select
 ## Usage
 
 ```js
-import { Select } from 'rn-select';
+import { Select } from '@devrue/rn-select';
 
 export function App() {
   const pets = [
