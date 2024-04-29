@@ -37,7 +37,13 @@
   "keywords": [
     "react-native",
     "ios",
-    "android"
+    "android",
+    "select",
+    "rn-select",
+    "react-select",
+    "react-native-select",
+    "react-native-input",
+    "searchable-select"
   ],
   "repository": {
     "type": "git",

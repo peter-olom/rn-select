@@ -1,3 +1,5 @@
+[![npm version](https://badge.fury.io/js/@devrue%2Frn-select.svg)](https://badge.fury.io/js/@devrue%2Frn-select) ![ci workflow](https://github.com/peter-olom/rn-select/actions/workflows/ci.yml/badge.svg)
+
 # React Native Select
 
 React Native Select is a select component for React Native that is compatible with both mobile and web platforms. It is entirely written in TypeScript and comes with features such as being searchable, multiselect, and creatable.
@@ -10,7 +12,7 @@ React Native Select is a select component for React Native that is compatible wi
 
 | Mobile | Web |
 |--------|-----|
-| <img src="https://github.com/peter-olom/zero/blob/a6a40a37939ce33ad76a1b68920e20fa02a32662/rn-select/rnsm.gif?raw=true" width="1200" alt="Mobile Demo" /> | ![Web Demo](https://github.com/peter-olom/zero/blob/a6a40a37939ce33ad76a1b68920e20fa02a32662/rn-select/rnsw.gif?raw=true) |
+| <img src="https://github.com/peter-olom/zero/blob/a6a40a37939ce33ad76a1b68920e20fa02a32662/rn-select/rnsm.gif?raw=true" width="100%" alt="Mobile Demo" /> | <img src="https://github.com/peter-olom/zero/blob/a6a40a37939ce33ad76a1b68920e20fa02a32662/rn-select/rnsw.gif?raw=true" width="100%" alt="Mobile Demo" /> |
 
 
 ## Installation
