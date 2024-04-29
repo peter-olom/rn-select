@@ -43,7 +43,7 @@
     "type": "git",
     "url": "git+https://github.com/peter-olom/rn-select.git"
   },
-  "author": "Peter Olom <ptr.olom@gmail.com> (https://github.com/peter-olom)",
+  "author": "Peter Olom <peter@olom.dev> (https://github.com/peter-olom)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/peter-olom/rn-select/issues"

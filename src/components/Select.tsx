@@ -19,6 +19,7 @@ import ListContainer from './ListContainer';
 import EmptyList from './EmptyList';
 import { Platform } from 'react-native';
 import { MIN_WIDTH } from './common';
+import { uniqBy } from 'lodash';
 
 function extractStyleProps<T extends object>(
   obj: T,
@@ -70,12 +71,14 @@ export interface CommonProps {
   reverse?: boolean;
   selectionEffectColor?: string;
   optionsScrollIndicator?: boolean;
+  emptyOptionsPlaceholder?: string;
   emptySearchMsg?: string;
   value?: string | string[];
   clearable?: boolean;
   disabled?: boolean;
   searchable?: boolean;
   createable?: boolean;
+  avoidBottom?: 'height' | 'position';
   onCreateItem?: (value: string) => void;
   onChangeInput?: (value: string) => void;
   renderAnchor?: RenderAnchor;
@@ -128,11 +131,13 @@ export default function Select({
   reverse,
   selectionEffectColor,
   optionsScrollIndicator = true,
+  emptyOptionsPlaceholder = 'No Options',
   emptySearchMsg,
   clearable = true,
   disabled,
   searchable = true,
   createable,
+  avoidBottom,
   renderAnchor,
   renderSearch,
   renderOption,
@@ -146,6 +151,7 @@ export default function Select({
   const [search, setSearch] = useState('');
   const [anchorPosition, setAnchorPosition] = useState<AnchorPos>({});
   const [createdOptions, setCreatedOptions] = useState<Option[]>([]);
+  const [bottomSpacerHeight, setBottomSpacerHeight] = useState(50);
 
   const styles = useStyles(
     ({ tokens: { size } }) => ({
@@ -195,8 +201,8 @@ export default function Select({
 
   const list = useMemo(
     () =>
-      [...options, ...createdOptions].filter(([_, val]) =>
-        val.toLowerCase().includes(search.toLowerCase())
+      uniqBy([...options, ...createdOptions], ([key]) => key).filter(
+        ([_, val]) => val.toLowerCase().includes(search.toLowerCase())
       ),
     [createdOptions, options, search]
   );
@@ -261,7 +267,7 @@ export default function Select({
   const anchorStyleProps = extractStyleProps(rest, 'select', 'Style');
   const searchStyleProps = extractStyleProps(rest, 'search', 'Style');
   const optionStyleProps = extractStyleProps(rest, 'option', 'Style');
-  const noOptions = options.length === 0 ? 'No Options' : undefined;
+  const noOptions = options.length === 0 ? emptyOptionsPlaceholder : undefined;
 
   const multi = useMemo(() => ('multi' in rest ? true : false), [rest]);
 
@@ -347,6 +353,8 @@ export default function Select({
           },
           default: { animationType: 'slide' },
         })}
+        avoidBottom={avoidBottom}
+        onOptionsOffet={setBottomSpacerHeight}
       >
         {searchable && (
           <>
@@ -383,7 +391,7 @@ export default function Select({
           showsVerticalScrollIndicator={optionsScrollIndicator}
           ItemSeparatorComponent={optionDivider ?? Divider}
           keyboardShouldPersistTaps="handled"
-          ListFooterComponent={BottomSpacer}
+          ListFooterComponent={<BottomSpacer height={bottomSpacerHeight} />}
           ListEmptyComponent={
             <EmptyList
               textStyle={emptyTextStyle}

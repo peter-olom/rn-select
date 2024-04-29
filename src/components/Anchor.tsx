@@ -68,6 +68,7 @@ export default function Anchor({
         paddingHorizontal: tokens.size.sm - 4,
       },
       iconContainer: { flexDirection: 'row', alignItems: 'center' },
+      fill: { flex: 1 },
       placeholder: { color: '#808080' },
       closeIconContainer: {
         height: tokens.size.xl + 4,
@@ -109,14 +110,14 @@ export default function Anchor({
     >
       {selected.length === 0 && (
         <Text
-          style={[styles.placeholder, selectPlaceholderTextStyle]}
+          style={[styles.placeholder, selectPlaceholderTextStyle, styles.fill]}
           numberOfLines={1}
         >
           {placeholder}
         </Text>
       )}
       {selected.length === 1 && !multi && (
-        <Text style={[selectTextStyle]} numberOfLines={1}>
+        <Text style={[selectTextStyle, styles.fill]} numberOfLines={1}>
           {selected[0]?.[1]}
         </Text>
       )}

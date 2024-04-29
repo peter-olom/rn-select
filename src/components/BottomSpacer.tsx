@@ -1,22 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Keyboard, View } from 'react-native';
+import React from 'react';
+import { View } from 'react-native';
 import useStyles from '../hooks/useStyles';
 
-export default function BottomSpacer() {
-  const [height, setHeight] = useState(0);
+interface Props {
+  height?: number;
+}
+export default function BottomSpacer({ height = 50 }: Props) {
   const styles = useStyles(
     () => ({
-      container: {
-        height: height,
+      spacer: {
+        height,
       },
     }),
     [height]
   );
-  useEffect(() => {
-    Keyboard.addListener('keyboardDidShow', () =>
-      setHeight(Keyboard.metrics()?.height ?? 300)
-    );
-    Keyboard.addListener('keyboardDidHide', () => setHeight(0));
-  });
-  return <View style={[styles.container]} />;
+  return <View style={[styles.spacer]} />;
 }

@@ -20,7 +20,7 @@ export default function App() {
             <MultiSelect label="Multi Select" />
             <SingleSelect label="Single Select" optionsCount={3} />
             <SingleSelect label="No Options" optionsCount={0} />
-            <MultiSelect label="Creatable Select" creatable />
+            <MultiSelect label="Creatable Select" creatable optionsCount={5} />
             <MultiSelect
               label="Disabled Select"
               optionsCount={10}

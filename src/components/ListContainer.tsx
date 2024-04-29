@@ -13,12 +13,16 @@ import { MIN_WIDTH } from './common';
 
 interface Props extends ModalProps {
   position?: AnchorPos;
+  avoidBottom?: 'height' | 'position';
+  onOptionsOffet?: (offset: number) => void;
 }
 
 export default function ListContainer({
   children,
   style,
   position,
+  avoidBottom,
+  onOptionsOffet,
   ...rest
 }: Props) {
   const { width, height } = useWindowDimensions();
@@ -32,11 +36,13 @@ export default function ListContainer({
     : undefined;
 
   const top = useMemo(() => {
-    if (height - (position?.y ?? 0) < listHeight + 80) {
-      return height - listHeight - 80;
+    if (Platform.OS === 'web' && avoidBottom === 'position') {
+      if (height - (position?.y ?? 0) < listHeight + 80) {
+        return height - listHeight - 80;
+      }
     }
     return position?.y ?? 0;
-  }, [height, listHeight, position?.y]);
+  }, [height, listHeight, position?.y, avoidBottom]);
 
   const styles = useStyles(
     ({ tokens }) => ({
@@ -78,13 +84,20 @@ export default function ListContainer({
     [left, right, top]
   );
 
+  const handleListHeight = (listContentHeight: number) => {
+    if (Platform.OS === 'web' && avoidBottom === 'height') {
+      onOptionsOffet?.(height - listContentHeight - 80);
+    }
+    setListHeight(listContentHeight);
+  };
+
   return (
     <Modal {...rest}>
       <Pressable style={styles.backdrop} onPress={rest.onRequestClose}>
         <SafeAreaProvider>
           <ListContent
             style={[styles.optionsContainer, style]}
-            onListHeight={setListHeight}
+            onListHeight={handleListHeight}
           >
             <View style={styles.optionsContainerInner}>{children}</View>
           </ListContent>
