@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { Select } from 'rn-select';
+import { Select } from '@devrue/rn-select';
 
 export default function App() {
   const { width } = useWindowDimensions();

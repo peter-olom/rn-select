@@ -35,7 +35,7 @@ export function App() {
     ['horse', 'Horse'],
     ['fish', 'Fish'],
   ]
-  return <Selelect options={pets} />
+  return <Select options={pets} />
 }
 ```
 

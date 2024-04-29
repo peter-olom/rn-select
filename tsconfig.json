@@ -2,7 +2,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "rn-select": ["./src/index"]
+      "@devrue/rn-select": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
