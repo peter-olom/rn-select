@@ -78,7 +78,7 @@ export interface CommonProps {
   clearable?: boolean;
   disabled?: boolean;
   searchable?: boolean;
-  createable?: boolean;
+  createable?: boolean | ((trigger: () => void) => React.ReactElement);
   avoidBottom?: 'height' | 'position';
   onCreateItem?: (value: string) => void;
   onChangeInput?: (value: string) => void;
@@ -397,7 +397,13 @@ export default function Select({
             <EmptyList
               textStyle={emptyTextStyle}
               msg={noOptions ?? emptySearchMsg}
-              createOption={createable ? search : undefined}
+              createOption={
+                typeof createable === 'function'
+                  ? createable(() => handleCreateItem(search))
+                  : createable
+                  ? search
+                  : undefined
+              }
               onCreate={handleCreateItem}
             />
           }

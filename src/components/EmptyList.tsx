@@ -6,7 +6,7 @@ import { Pressable } from 'react-native';
 interface Props {
   msg?: ReactNode;
   textStyle?: TextStyle;
-  createOption?: string;
+  createOption?: string | React.ReactElement;
   onCreate?: (value: string) => void;
 }
 export default function EmptyList({
@@ -49,14 +49,17 @@ export default function EmptyList({
             msg}
         </>
       )}
-      {createOption && (
-        <Pressable
-          style={styles.create}
-          onPress={() => onCreate?.(createOption)}
-        >
-          <Text>Create "{createOption}"</Text>
-        </Pressable>
-      )}
+      {createOption &&
+        (typeof createOption === 'string' ? (
+          <Pressable
+            style={styles.create}
+            onPress={() => onCreate?.(createOption)}
+          >
+            <Text>Create "{createOption}"</Text>
+          </Pressable>
+        ) : (
+          createOption
+        ))}
     </View>
   );
 }
