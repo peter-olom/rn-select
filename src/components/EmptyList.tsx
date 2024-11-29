@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { Text, View, type TextStyle } from 'react-native';
 import useStyles from '../hooks/useStyles';
 import { Pressable } from 'react-native';
 
 interface Props {
-  msg?: string;
+  msg?: ReactNode;
   textStyle?: TextStyle;
   createOption?: string;
   onCreate?: (value: string) => void;
@@ -40,9 +40,14 @@ export default function EmptyList({
   return (
     <View style={[styles.container]}>
       {!createOption && (
-        <Text style={[styles.text, textStyle]}>
-          {msg ?? '"No option matched your search"'}
-        </Text>
+        <>
+          {((typeof msg === 'string' || msg === undefined) && (
+            <Text style={[styles.text, textStyle]}>
+              {msg ?? '"No option matched your search"'}
+            </Text>
+          )) ||
+            msg}
+        </>
       )}
       {createOption && (
         <Pressable

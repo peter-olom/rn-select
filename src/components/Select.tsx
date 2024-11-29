@@ -3,6 +3,7 @@ import React, {
   useMemo,
   useState,
   type ComponentType,
+  type ReactNode,
 } from 'react';
 import SearchBox from './SearchBox';
 import { Text, View } from 'react-native';
@@ -72,7 +73,7 @@ export interface CommonProps {
   selectionEffectColor?: string;
   optionsScrollIndicator?: boolean;
   emptyOptionsPlaceholder?: string;
-  emptySearchMsg?: string;
+  emptySearchMsg?: ReactNode;
   value?: string | string[];
   clearable?: boolean;
   disabled?: boolean;

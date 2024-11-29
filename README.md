@@ -1,4 +1,4 @@
-[![npm version](https://badge.fury.io/js/@devrue%2Frn-select.svg)](https://badge.fury.io/js/@devrue%2Frn-select) ![ci workflow](https://github.com/peter-olom/rn-select/actions/workflows/ci.yml/badge.svg)
+[![npm version](https://badge.fury.io/js/@devrue%2Frn-select.svg)](https://badge.fury.io/js/@devrue%2Frn-select.svg) ![ci workflow](https://github.com/peter-olom/rn-select/actions/workflows/ci.yml/badge.svg)
 
 # React Native Select
 
