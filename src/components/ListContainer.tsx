@@ -37,9 +37,9 @@ export default function ListContainer({
 
   const top = useMemo(() => {
     if (Platform.OS === 'web' && avoidBottom === 'position') {
-      if (height - (position?.y ?? 0) < listHeight + 80) {
-        return height - listHeight - 80;
-      }
+      const maxTop = height - listHeight - 80;
+      const preferredTop = position?.y ?? 0;
+      return Math.min(preferredTop, maxTop);
     }
     return position?.y ?? 0;
   }, [height, listHeight, position?.y, avoidBottom]);
@@ -59,7 +59,7 @@ export default function ListContainer({
             left,
             right,
             maxHeight: 400,
-            position: 'absolute',
+            position: 'fixed' as any, // this style is only applied on web
             paddingVertical: tokens.size.sm,
             marginTop: tokens.size.xl + tokens.size.sm,
             gap: tokens.size.sm,

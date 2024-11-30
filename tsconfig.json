@@ -2,14 +2,19 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "@devrue/rn-select": ["./src/index"]
+      "@devrue/rn-select": [
+        "./src/index"
+      ]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
-    "lib": ["esnext"],
+    "lib": [
+      "esnext",
+      "DOM"
+    ],
     "module": "esnext",
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,

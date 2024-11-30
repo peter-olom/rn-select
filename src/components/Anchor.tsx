@@ -6,6 +6,7 @@ import {
   View,
   type TextStyle,
   Dimensions,
+  Platform,
 } from 'react-native';
 import useStyles from '../hooks/useStyles';
 import ChevronDownIcon from '../icons/ChevronDownIcon';
@@ -13,6 +14,7 @@ import type { IconStyle, LayoutRect, Option } from '../types';
 import Selections from './Selections';
 import CloseIcon from '../icons/CloseIcon';
 import { StyleSheet } from 'react-native';
+import debounce from 'lodash/debounce';
 
 interface Props extends Omit<PressableProps, 'onLayout'> {
   placeholder?: string;
@@ -87,18 +89,31 @@ export default function Anchor({
   const onLayoutRef = useRef(onLayout);
 
   useEffect(() => {
-    const onViewLayout = () => {
+    const updatePosition = () => {
       if (ref.current) {
         ref.current.measure((x, y, width, height, pageX, pageY) => {
           onLayoutRef.current({ x, y, width, height, left: pageX, top: pageY });
         });
       }
     };
-    const subscription = Dimensions.addEventListener('change', onViewLayout);
-    onViewLayout();
+
+    const debouncedUpdate = debounce(updatePosition, 16);
+
+    const subscription = Dimensions.addEventListener('change', debouncedUpdate);
+
+    // Track scroll events on web
+    if (Platform.OS === 'web' && window) {
+      window.addEventListener('scroll', debouncedUpdate, true);
+    }
+
+    updatePosition();
 
     return () => {
       subscription.remove();
+      debouncedUpdate.cancel();
+      if (Platform.OS === 'web') {
+        window.removeEventListener('scroll', debouncedUpdate, true);
+      }
     };
   }, []);
 
