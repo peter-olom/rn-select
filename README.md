@@ -69,7 +69,7 @@ export function App() {
 | reverse                       | Flag to reverse option and check mark positon| `false`       |
 | selectionEffectColor          | Color for selection effect                  | None          |
 | optionsScrollIndicator        | Flag to show scroll indicator for options   | `true`        |
-| emptyOptionsPlaceholder       | Placeholder text when options is empty      | `true`        |
+| emptyOptionsPlaceholder       | Placeholder text when options is empty      | 'No Options'  |
 | emptySearchMsg                | Message when search results are empty       | "No options"  |
 | value                         | Currently selected value(s) `string` or `Array<string>`| None|
 | clearable                     | Flag to enable clearing of selection        | `true`       |
