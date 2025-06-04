@@ -107,10 +107,10 @@ export default function ListContainer({
   );
 }
 
-interface Props extends ViewProps {
+interface ListContentProps extends ViewProps {
   onListHeight?: (height: number) => void;
 }
-function ListContent({ onListHeight, ...rest }: Props) {
+function ListContent({ onListHeight, ...rest }: ListContentProps) {
   const [containerRef, setContainerRef] = useState<View | null>(null);
 
   useEffect(() => {
