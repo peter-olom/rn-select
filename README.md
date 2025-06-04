@@ -66,7 +66,7 @@ export function App() {
 | searchPlaceholderTextColor    | Text color for the search input placeholder | None          |
 | showSelectionCount            | Flag to show the count of selected items    | `true`       |
 | options                       | Array of options (`Array<[key, value]>`)    | Required      |
-| reverse                       | Flag to reverse option and check mark positon| `false`       |
+| reverse                       | Flag to reverse option and check mark position| `false`       |
 | selectionEffectColor          | Color for selection effect                  | None          |
 | optionsScrollIndicator        | Flag to show scroll indicator for options   | `true`        |
 | emptyOptionsPlaceholder       | Placeholder text when options is empty      | `true`        |
