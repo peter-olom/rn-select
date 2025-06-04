@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
+import { render, fireEvent } from '@testing-library/react-native';
 
 jest.mock('react-native/Libraries/Modal/Modal', () => {
   const React = require('react');
@@ -13,16 +13,17 @@ jest.mock('react-native-safe-area-context', () => {
   };
 });
 import { Select } from '../index';
+import type { Option } from '../types';
 
-const OPTIONS = [
+const OPTIONS: Option[] = [
   ['1', 'One'],
   ['2', 'Two'],
 ];
 
 describe('Select', () => {
-  it('opens option list and selects a value', async () => {
+  it('opens option list and selects a value', () => {
     const onChangeValue = jest.fn();
-    const { getByText, queryByText, getByRole } = render(
+    const { getByText, queryByText } = render(
       <Select
         options={OPTIONS}
         onChangeValue={onChangeValue}
@@ -32,13 +33,9 @@ describe('Select', () => {
 
     expect(queryByText('One')).toBeNull();
 
-    await act(async () => {
-      fireEvent.press(getByText('Pick'));
-    });
+    fireEvent.press(getByText('Pick'));
 
-    await waitFor(() => {
-      expect(getByRole('searchbox')).toBeTruthy();
-    });
+    expect(getByText('One')).toBeTruthy();
 
     fireEvent.press(getByText('One'));
 
